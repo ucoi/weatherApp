@@ -3,16 +3,67 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Weather</title>
+    <title>Weather App</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <form class="weatherForm">
-      <input type="text" class="cityInput" placeholder="Enter a City" />
-      <button type="submit">Get weather</button>
-    </form>
+    <div class="app-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <span class="eyebrow">Weather made simple</span>
+          <h1>Weather App</h1>
+          <p>Search a city, switch units, and get fast weather details with a clean dashboard.</p>
+        </div>
+        <button class="locationBtn" type="button">Use current location</button>
+      </header>
 
-    <div class="card" style="display: none"></div>
+      <main class="main-grid">
+        <section class="panel search-panel">
+          <form class="weatherForm">
+            <div class="input-group">
+              <input
+                type="text"
+                class="cityInput"
+                placeholder="Enter a city"
+                aria-label="City name"
+              />
+              <button type="submit">Search</button>
+            </div>
+          </form>
+
+          <div class="settings">
+            <label class="unit-switch">
+              <input type="checkbox" class="unitToggle" />
+              <span class="slider"></span>
+            </label>
+            <span class="toggleLabel">°C</span>
+          </div>
+
+          <div class="historyPanel">
+            <div class="history-header">
+              <h2>Recent cities</h2>
+            </div>
+            <ul class="historyList"></ul>
+          </div>
+        </section>
+
+        <section class="panel weather-panel">
+          <div class="statusArea hidden">
+            <div class="loader"></div>
+            <span>Loading weather...</span>
+          </div>
+
+          <article class="card hidden"></article>
+
+          <section class="forecast hidden">
+            <div class="forecast-header">
+              <h2>Next days</h2>
+            </div>
+            <div class="forecastGrid"></div>
+          </section>
+        </section>
+      </main>
+    </div>
 
     <script src="app.js"></script>
   </body>
