@@ -1,9 +1,5 @@
 {
   "buildCommand": "tsc",
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "index.html"
-    }
-  ]
+  "devCommand": "tsc --watch",
+  "outputDirectory": "."
 }
