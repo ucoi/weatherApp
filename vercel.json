@@ -1,0 +1,5 @@
+{
+  "buildCommand": "tsc && cp index.html dist/ && cp style.css dist/",
+  "outputDirectory": "dist",
+  "installCommand": "npm install"
+}
