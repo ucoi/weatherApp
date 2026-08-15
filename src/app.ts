@@ -1,18 +1,71 @@
-const weatherForm = document.querySelector('.weatherForm');
-const cityInput = document.querySelector('.cityInput');
-const card = document.querySelector('.card');
-const forecastSection = document.querySelector('.forecast');
-const forecastGrid = document.querySelector('.forecastGrid');
-const statusArea = document.querySelector('.statusArea');
-const unitToggle = document.querySelector('.unitToggle');
-const toggleLabel = document.querySelector('.toggleLabel');
-const historyList = document.querySelector('.historyList');
-const locationBtn = document.querySelector('.locationBtn');
-const apiKey = '165ae638de5cb73e8a5b37895517e08e';
-let unit = localStorage.getItem('weatherUnit') || 'metric';
-let historyCities = JSON.parse(localStorage.getItem('weatherHistory') || '[]');
+const weatherForm = document.querySelector<HTMLFormElement>('.weatherForm');
+const cityInput = document.querySelector<HTMLInputElement>('.cityInput');
+const card = document.querySelector<HTMLElement>('.card');
+const forecastSection = document.querySelector<HTMLElement>('.forecast');
+const forecastGrid = document.querySelector<HTMLElement>('.forecastGrid');
+const statusArea = document.querySelector<HTMLElement>('.statusArea');
+const unitToggle = document.querySelector<HTMLInputElement>('.unitToggle');
+const toggleLabel = document.querySelector<HTMLElement>('.toggleLabel');
+const historyList = document.querySelector<HTMLUListElement>('.historyList');
+const locationBtn = document.querySelector<HTMLButtonElement>('.locationBtn');
 
-function initialize() {
+if (!weatherForm || !cityInput || !card || !forecastSection || !forecastGrid || !statusArea || !unitToggle || !toggleLabel || !historyList || !locationBtn) {
+  throw new Error('Required weather elements could not be found in the page.');
+}
+
+const apiKey = '165ae638de5cb73e8a5b37895517e08e';
+let unit: 'metric' | 'imperial' = (localStorage.getItem('weatherUnit') === 'imperial' ? 'imperial' : 'metric');
+
+const storedHistory = localStorage.getItem('weatherHistory');
+let historyCities: string[] = [];
+
+try {
+  const parsed = storedHistory ? JSON.parse(storedHistory) : [];
+  historyCities = Array.isArray(parsed)
+    ? parsed.filter((item): item is string => typeof item === 'string')
+    : [];
+} catch {
+  historyCities = [];
+}
+
+interface WeatherApiResponse {
+  name: string;
+  sys: {
+    country: string;
+    sunrise: number;
+    sunset: number;
+  };
+  weather: Array<{
+    description: string;
+    id: number;
+  }>;
+  main: {
+    temp: number;
+    feels_like: number;
+    humidity: number;
+    pressure: number;
+  };
+  wind: {
+    speed: number;
+  };
+  dt: number;
+  timezone?: number;
+}
+
+interface ForecastApiResponse {
+  list: Array<{
+    dt_txt: string;
+    main: {
+      temp: number;
+    };
+    weather: Array<{
+      id: number;
+      description: string;
+    }>;
+  }>;
+}
+
+function initialize(): void {
   unitToggle.checked = unit === 'imperial';
   toggleLabel.textContent = unit === 'imperial' ? '°F' : '°C';
   loadHistory();
@@ -25,7 +78,7 @@ function initialize() {
   }
 }
 
-weatherForm.addEventListener('submit', async event => {
+weatherForm.addEventListener('submit', async (event: SubmitEvent) => {
   event.preventDefault();
   const city = cityInput.value.trim();
   if (!city) {
@@ -54,7 +107,7 @@ locationBtn.addEventListener('click', () => {
 
   showStatus('Getting your location...');
   navigator.geolocation.getCurrentPosition(
-    async position => {
+    async (position) => {
       const { latitude, longitude } = position.coords;
       await fetchByCoordinates(latitude, longitude);
     },
@@ -65,13 +118,14 @@ locationBtn.addEventListener('click', () => {
   );
 });
 
-historyList.addEventListener('click', async event => {
-  const button = event.target.closest('button[data-city]');
-  if (!button) return;
-  await fetchAndDisplay(button.dataset.city);
+historyList.addEventListener('click', async (event: MouseEvent) => {
+  const target = event.target;
+  const button = target instanceof Element ? target.closest('button[data-city]') : null;
+  if (!(button instanceof HTMLButtonElement)) return;
+  await fetchAndDisplay(button.dataset.city ?? '');
 });
 
-async function fetchAndDisplay(city) {
+async function fetchAndDisplay(city: string): Promise<void> {
   try {
     showStatus('Loading weather...');
     const weatherData = await getWeatherData(city);
