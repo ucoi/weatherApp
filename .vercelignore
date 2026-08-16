@@ -1,7 +1,5 @@
-src
 node_modules
 .git
 .gitignore
 build.js
-tsconfig.json
 package-lock.json
